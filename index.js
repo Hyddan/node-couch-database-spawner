@@ -1,0 +1,1 @@
+module.exports = require('./lib/node-couch-database-spawner');

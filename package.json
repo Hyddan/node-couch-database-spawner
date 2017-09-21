@@ -1,0 +1,27 @@
+{
+  "name": "node-couch-database-spawner",
+  "version": "1.0.0",
+  "description": "CouchDb database spawner for Node.Js using node-couch",
+  "scripts": {
+    "compile": "grunt compile",
+    "prepublish": "npm run compile"
+  },
+  "keywords": [
+    "Node.Js",
+    "node",
+    "CouchDb",
+    "couch",
+    "database",
+    "spawner"
+  ],
+  "author": "Daniel Hedenius",
+  "license": "WTFPL-2.0",
+  "devDependencies": {
+    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "load-grunt-tasks": "^3.5.2"
+  },
+  "dependencies": {
+    "node-couch": "^2.2.1"
+  }
+}
