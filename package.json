@@ -1,6 +1,6 @@
 {
   "name": "node-couch-database-spawner",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "CouchDb database spawner for Node.Js using node-couch",
   "scripts": {
     "compile": "grunt compile",

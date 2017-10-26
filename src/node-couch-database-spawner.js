@@ -4,7 +4,6 @@ module.exports = {
             _nodeCouch = require('node-couch'),
             _path = require('path'),
             _options = Object.assign({}, options),
-            _couchDb = new _nodeCouch.Client().initialize(_options.nodeCouch),
             _databases = [],
             _databasesPath = _options.databasesPath || _path.join(process.cwd(), './databases/'),
             _docTypes = 0,
@@ -12,15 +11,15 @@ module.exports = {
             _done = function () {
                 _databases.forEach(function (database) {
                     (function (db) { // Re-scope database object
-                        var _spawn = function(_db) {
+                        var _spawn = function(_couchDb, _db) {
                             _couchDb.Database.create(function (databaseError, databaseResponse) {
                                 if (databaseError) {
-                                    console.log(Color.red('Failed to spawn database: ' + db.id));
+                                    console.log(Color.red('Failed to spawn database: ' + _db.id));
 
                                     return;
                                 }
 
-                                console.log(Color.green('Spawned database: ' + db.id));
+                                console.log(Color.green('Spawned database: ' + _db.id));
                                 this.parent().Document.Bulk.create(database.documents, function (documentsError, documentsResponse) {
                                     if (documentsError) {
                                         console.log(Color.red('Failed to bulk spawn documents'));
@@ -32,7 +31,7 @@ module.exports = {
                                     0 < documentsResponse.successful.length && console.log(Color.green('Successfully bulk spawned: ' + documentsResponse.successful.length + ' out of: ' + documentsResponse.response.length + ' documents'));
 
                                     var _self = this;
-                                    db.designs.forEach(function (design) {
+                                    _db.designs.forEach(function (design) {
                                         (function (designDoc) { // Re-scope design document object
                                             _self.parent().parent().Design.create(designDoc, function (designDocError, designDocResponse) {
                                                 if (documentsError) {
@@ -49,35 +48,37 @@ module.exports = {
                             });
                         };
 
-                        _couchDb.Database.select(db.id)
-                            .exists(function (error, response) {
-                                if (error) {
-                                    if (error.error && 404 === error.error.statusCode) {
-                                        console.log(Color.green('Database: ' + db.id + ' doesn\'t exist, spawning...'));
+                        new _nodeCouch.Client()
+                                        .initialize(_options.nodeCouch)
+                                        .Database.select(db.id)
+                                                    .exists(function (error, response) {
+                                                        if (error) {
+                                                            if (error.error && 404 === error.error.statusCode) {
+                                                                console.log(Color.green('Database: ' + db.id + ' doesn\'t exist, spawning...'));
 
-                                        _spawn(db);
+                                                                _spawn(this.parent(), db);
 
-                                        return;
-                                    }
+                                                                return;
+                                                            }
 
-                                    console.log(Color.red('General error, not spawning anything'));
-                                    console.log(error);
+                                                            console.log(Color.red('General error, not spawning anything for database: ' + db.id));
+                                                            console.log(error);
 
-                                    return;
-                                }
+                                                            return;
+                                                        }
 
-                                console.log(Color.green('Database: ' + db.id + ' exists, deleting and respawning...'));
-                                this.delete(function (databaseDeleteError, databaseDeleteResponse) {
-                                    if (databaseDeleteError) {
-                                        console.log(Color.red('Failed to delete database: ' + db.id + ', terminating'));
-                                        console.log(databaseDeleteError);
+                                                        console.log(Color.green('Database: ' + db.id + ' exists, deleting and respawning...'));
+                                                        this.delete(function (databaseDeleteError, databaseDeleteResponse) {
+                                                            if (databaseDeleteError) {
+                                                                console.log(Color.red('Failed to delete database: ' + db.id + ', terminating'));
+                                                                console.log(databaseDeleteError);
 
-                                        return;
-                                    }
+                                                                return;
+                                                            }
 
-                                    _spawn(db);
-                                });
-                            });
+                                                            _spawn(this.parent(), db);
+                                                        });
+                                                    });
                     })(database);
                 });
             },
