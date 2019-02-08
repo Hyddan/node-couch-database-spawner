@@ -132,6 +132,8 @@ module.exports = {
                                         contentByType.forEach(function (designDoc) {
                                             _database[type].push(require(_path.resolve(_databasesPath + d + '/' + type + '/' + designDoc)));
                                         });
+
+                                        !contents.some(function (t) { return 'documents' === t;}) && _done();
                                     }
                                     else if ('documents' === type) {
                                         _docTypes = contentByType.length;
@@ -163,6 +165,8 @@ module.exports = {
                                                 });
                                             }
                                         });
+
+                                        !contentByType.length && _done();
                                     }
                                 }.bind(null, c));
                             }

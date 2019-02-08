@@ -59,5 +59,6 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
+ * 2019-02-08   v1.2.0   Fix for spawning partial databases.
  * 2017-10-26   v1.1.0   Fix for spawning multiple databases.
  * 2017-09-22   v1.0.0   Initial version.
